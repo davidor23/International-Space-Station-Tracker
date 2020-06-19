@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    </head>
+<body>
+
+</body>
+</html>
+    <style>
+        #issMap{
+            height: 750px;
+            width: 100%;
+            background-repeat: no-repeat;
+            max-width: 100%;
+        }
+        h1{
+            display: flex;
+            justify-content: center;
+            background: rgb(227,227,227);
+
+        }
+        p{
+            display: flex;
+            justify-content: center;
+        }
+        *{
+            background: rgb(221,221,221);
+            font-family: 'Nunito Sans' , SansSerif;
+
+        }
+        img{
+            background: none;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>ISS Location</title>
+</head>
+<body>
+<h1>Location of the ISS</h1>
+<p>Latitude: <span id="lat"></span><br/></p>
+<p>Longitude: <span id="lon"></span></p>
+
+<div id="issMap"></div>
+<script>
+    const myMap = L.map('issMap').setView([0,0], 1);
+    //Making the map and tiles
+    const attribution =
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const tiles = L.tileLayer(tileUrl,{attribution});
+    tiles.addTo(myMap);
+//Making the marker with a custom icon(millennium falcon)
+    var myIcon = L.icon({
+        iconUrl:'iss200.png',
+        iconSize:[50,32],
+        iconAnchor:[25,16],
+        popupAnchor:[-3,-76],
+    });
+
+  const marker =  L.marker([0, 0], {icon:myIcon}).addTo(myMap);
+
+
+
+    const apiUrl = 'https://api.wheretheiss.at/v1/satellites/25544';
+
+    let firstTime = true;
+
+    async function getISS() {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const {latitude, longitude} = data;
+
+    //other way to do it without marker variable.
+   // L.marker([latitude, longitude]).addTo(myMap);
+
+
+        marker.setLatLng([latitude,longitude]);
+        if(firstTime){
+            myMap.setView([latitude,longitude],5);
+
+            firstTime = false;
+        }
+
+
+    document.getElementById('lat').textContent = latitude;
+    document.getElementById('lon').textContent = longitude;
+    console.log(latitude);
+    console.log(longitude);
+    }
+
+    getISS();
+
+    setInterval(getISS, 1000);
+</script>
+</body>
+<footer>
+&copy; By David O'Reilly
+</footer>
+</html>
